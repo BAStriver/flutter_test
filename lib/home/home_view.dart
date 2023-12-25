@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_123/tool/net_manager.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 
 class HomeView extends StatefulWidget {
@@ -10,6 +11,7 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   late ScrollController _scrollController;
+  final NetManager _netManager = NetManager();
 
   @override
   void initState() {
@@ -23,6 +25,8 @@ class _HomeViewState extends State<HomeView> {
           print('refreshing.');
         }
       });
+
+    _requestData(1);
   }
 
   @override
@@ -126,5 +130,9 @@ class _HomeViewState extends State<HomeView> {
         ],
       ),
     );
+  }
+
+ void _requestData(int page) async {
+    await _netManager.queryHomeData(page);
   }
 }
