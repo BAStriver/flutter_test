@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_123/mode/home_model.dart';
+import 'package:flutter_123/mode/new_model.dart';
 import 'package:flutter_123/tool/net_manager.dart';
 import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 
@@ -13,6 +15,9 @@ class _HomeViewState extends State<HomeView> {
   late ScrollController _scrollController;
   final NetManager _netManager = NetManager();
 
+  late final List<News> _dataList = [];
+  int _currentPage = 1;
+
   @override
   void initState() {
     super.initState();
@@ -26,7 +31,7 @@ class _HomeViewState extends State<HomeView> {
         }
       });
 
-    _requestData(1);
+    _requestData(_currentPage);
   }
 
   @override
@@ -44,10 +49,10 @@ class _HomeViewState extends State<HomeView> {
               return _buildSwiper(context);
             } else {
               // build view list
-              return _buildItem(context, index);
+              return _buildItem(context, index + 2);
             }
           },
-          itemCount: 10,
+          itemCount: _getItemCount(),
         ),
       ),
     );
@@ -55,9 +60,20 @@ class _HomeViewState extends State<HomeView> {
 
   // dropdown refresh
   Future<Null> _onRefresh() async {
-    await Future.delayed(const Duration(seconds: 3), () {
-      print('dropdown to refresh.');
-    });
+    print('refreshing...');
+    _currentPage = 1;
+    await _requestData(_currentPage);
+    // await Future.delayed(const Duration(seconds: 3), () {
+    //   print('dropdown to refresh.');
+    // });
+  }
+
+  int _getItemCount() {
+    if (_dataList.length > 3) {
+      return _dataList.length - 3 + 1;
+    } else {
+      return 0;
+    }
   }
 
   // handle swapper
@@ -71,16 +87,12 @@ class _HomeViewState extends State<HomeView> {
         itemCount: 3,
         itemBuilder: (BuildContext context, int index) {
           return Container(
+            margin: const EdgeInsets.only(bottom: 5),
             color: Colors.orange,
             width: MediaQuery.of(context).size.width,
             height: 150,
-            child: Center(
-              child: Text(
-                "image$index",
-                style: const TextStyle(fontSize: 50),
-                textAlign: TextAlign.center,
-              ),
-            ),
+            child: Image.network(_dataList[_dataList.length-1].picUrl,
+            height: 150, width: MediaQuery.of(context).size.width, fit: BoxFit.fitWidth,),
           );
         },
       ),
@@ -99,9 +111,11 @@ class _HomeViewState extends State<HomeView> {
           Container(
             color: Colors.grey,
             child: Image.network(
-              "http://n.sinaimg.cn/sinakd202124s/162/w550h412/20210204/6706-kirmait9301473.jpg",
+              // "http://n.sinaimg.cn/sinakd202124s/162/w550h412/20210204/6706-kirmait9301473.jpg",
+              _dataList[_dataList.length-1].picUrl,
               width: 130,
               height: 110,
+              fit: BoxFit.fitHeight,
             ),
           ),
           Column(
@@ -110,20 +124,20 @@ class _HomeViewState extends State<HomeView> {
               Container(
                 margin: const EdgeInsets.only(left: 10, top: 10, right: 10),
                 width: MediaQuery.of(context).size.width - 130 - 20,
-                child: const Text(
-                  "News title",
+                child: Text(
+                  _dataList[index].title,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                 ),
               ),
               Container(
                 margin: const EdgeInsets.only(left: 10, top: 5),
-                child: const Text("News source"),
+                child: Text(_dataList[index].description),
               ),
               Container(
                 margin: const EdgeInsets.only(left: 10, top: 5),
-                child: const Text("Emit time"),
+                child: Text(_dataList[index].ctime),
               ),
             ],
           )
@@ -132,7 +146,19 @@ class _HomeViewState extends State<HomeView> {
     );
   }
 
- void _requestData(int page) async {
-    await _netManager.queryHomeData(page);
+ Future _requestData(int page) async {
+    print("page: "+ page.toString());
+    HomeModel data = await _netManager.queryHomeData(page);
+    if(page == 1) {
+      _dataList.clear();
+      _dataList.addAll(data.result.newslist);
+    } else {
+      // load more data
+      _dataList.addAll(data.result.newslist);
+    }
+    _currentPage ++;
+
+    setState(() {});
+    return;
   }
 }
