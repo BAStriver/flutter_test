@@ -1,5 +1,8 @@
+import 'dart:js';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_123/category/category_view.dart';
+import 'package:flutter_123/collection/collectin_view.dart';
 import 'package:flutter_123/home/home_view.dart';
 
 void main() {
@@ -12,25 +15,62 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return _containerView();
+    return MaterialApp(
+      home: _containerView(context),
+    );
   }
-  
-  Widget _containerView() {
-    return DefaultTabController(length: 2, child: MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          bottom: const TabBar(tabs: [
-            Tab(child: Text("热门", style: TextStyle(color: Colors.black),),),
-            Tab(child: Text("分类", style: TextStyle(color: Colors.black),),)
-          ], indicatorColor: Colors.green,),
-          title: const Text("新闻资讯", style: TextStyle(color: Colors.black), textAlign: TextAlign.center,),
-          backgroundColor: Colors.white,
-        ),
-        body: TabBarView(children: [
-          HomeView(),
-          CategoryView()
-        ],),
-      ),
-    ));
+
+  Widget _containerView(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      child: DefaultTabController(
+          length: 2,
+          child: Scaffold(
+            appBar: AppBar(
+              bottom: const TabBar(
+                tabs: [
+                  Tab(
+                    child: Text(
+                      "popular",
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                  Tab(
+                    child: Text(
+                      "classifications",
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  )
+                ],
+                indicatorColor: Colors.green,
+              ),
+              title: const Text(
+                "ALl News",
+                style: TextStyle(color: Colors.black),
+                textAlign: TextAlign.center,
+              ),
+              backgroundColor: Colors.white,
+              actions: <Widget>[
+                GestureDetector(
+                  child: Container(
+                    width: 60,
+                    child: const Icon(Icons.collections),
+                  ),
+                  onTap: () {
+                    print('enter collection view.');
+                    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+                      print('enter collection view2.');
+                      return CollectionView();
+                    }));
+                  },
+                )
+              ],
+            ),
+            body: TabBarView(
+              children: [HomeView(), CategoryView()],
+            ),
+          )),
+    );
   }
 }
