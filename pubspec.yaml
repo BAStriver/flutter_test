@@ -36,6 +36,9 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
   http: ^1.1.2
+  fluttertoast: ^8.2.4
+  shared_preferences: ^2.2.2
+#  flutter_native_web: ^1.0.3
 #  flutter_swiper: ^1.1.6
 
 dev_dependencies:

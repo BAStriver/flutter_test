@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_123/mode/home_model.dart';
 import 'package:flutter_123/mode/new_model.dart';
 import 'package:flutter_123/tool/net_manager.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CategoryListView extends StatefulWidget {
   String path;
@@ -100,44 +102,82 @@ class _CategoryListViewState extends State<CategoryListView> {
       width: MediaQuery.of(context).size.width,
       margin: const EdgeInsets.only(bottom: 1),
       color: Colors.amber,
-      child: Row(
-        children: <Widget>[
-          Container(
-            color: Colors.grey,
-            child: Image.network(
-              // "http://n.sinaimg.cn/sinakd202124s/162/w550h412/20210204/6706-kirmait9301473.jpg",
-              _dataList[index].picUrl,
-              width: 130,
-              height: 110,
-              fit: BoxFit.fitHeight,
+      child: GestureDetector(
+        child: Row(
+          children: <Widget>[
+            Container(
+              color: Colors.grey,
+              child: Image.network(
+                // "http://n.sinaimg.cn/sinakd202124s/162/w550h412/20210204/6706-kirmait9301473.jpg",
+                _dataList[index].picUrl,
+                width: 130,
+                height: 110,
+                fit: BoxFit.fitHeight,
+              ),
             ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                margin: const EdgeInsets.only(left: 10, top: 10, right: 10),
-                width: MediaQuery.of(context).size.width - 130 - 20,
-                child: Text(
-                  _dataList[index].title,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
-                  style: const TextStyle(
-                      fontSize: 15, fontWeight: FontWeight.bold),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  margin: const EdgeInsets.only(left: 10, top: 10, right: 10),
+                  width: MediaQuery.of(context).size.width - 130 - 20,
+                  child: Text(
+                    _dataList[index].title,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                    style: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.bold),
+                  ),
                 ),
-              ),
-              Container(
-                margin: const EdgeInsets.only(left: 10, top: 5),
-                child: Text(_dataList[index].description),
-              ),
-              Container(
-                margin: const EdgeInsets.only(left: 10, top: 5),
-                child: Text(_dataList[index].ctime),
-              ),
-            ],
-          )
-        ],
+                Container(
+                  margin: const EdgeInsets.only(left: 10, top: 5),
+                  child: Text(_dataList[index].description),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(left: 10, top: 5),
+                  child: Text(_dataList[index].ctime),
+                ),
+              ],
+            )
+          ],
+        ),
+        onLongPress: () {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Do you want to save it ?'),
+                  actions: <Widget>[
+                    TextButton(
+                        onPressed: () {
+                          _addCollection(
+                              _dataList[index].id, _dataList[index].title);
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('Yes')),
+                    TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text('No')),
+                  ],
+                );
+              });
+        },
       ),
     );
+  }
+
+  void _addCollection(String id, String title) async {
+    print('id: ' + id);
+    print('title: ' + title);
+    SharedPreferences? preferences = await SharedPreferences.getInstance();
+    String? data = preferences.getString(id);
+    if (data == null) {
+      await preferences.setString(id, title);
+      Fluttertoast.showToast(msg: 'saved successfully.');
+    } else {
+      Fluttertoast.showToast(msg: 'the new already existing.');
+    }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_123/base/base.dart';
 import 'package:flutter_123/category/category_list_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CategoryView extends StatefulWidget {
   @override
@@ -88,4 +89,5 @@ class _CategoryViewState extends State<CategoryView> {
       ),
     );
   }
+
 }
