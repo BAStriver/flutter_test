@@ -2,21 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_123/mode/home_model.dart';
 import 'package:flutter_123/mode/new_model.dart';
 import 'package:flutter_123/tool/net_manager.dart';
-import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 
-class HomeView extends StatefulWidget {
+class CategoryListView extends StatefulWidget {
+  String path;
+  String title;
+
+  CategoryListView(this.path, this.title, {super.key});
+
   @override
   State<StatefulWidget> createState() {
-    return _HomeViewState();
+    return _CategoryListViewState(path, title);
   }
 }
 
-class _HomeViewState extends State<HomeView> {
+class _CategoryListViewState extends State<CategoryListView> {
   late ScrollController _scrollController;
   final NetManager _netManager = NetManager();
-
-  late final List<News> _dataList = [];
+  final List<News> _dataList = [];
   int _currentPage = 1;
+  late String path;
+  late String title;
+
+  _CategoryListViewState(this.path, this.title);
 
   @override
   void initState() {
@@ -28,6 +35,7 @@ class _HomeViewState extends State<HomeView> {
         if (_scrollController.position.pixels ==
             _scrollController.position.maxScrollExtent) {
           print('refreshing.');
+          _requestData(_currentPage);
         }
       });
 
@@ -36,23 +44,27 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height,
-      color: Colors.white,
-      child: RefreshIndicator(
-        onRefresh: _onRefresh,
-        child: ListView.builder(
-          itemBuilder: (BuildContext context, int index) {
-            if (index == 0) {
-              // build swiper widget
-              return _buildSwiper(context);
-            } else {
+    AppBar _appbar = AppBar(
+      title: Text(title),
+    );
+
+    return Scaffold(
+      appBar: _appbar,
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height:
+            MediaQuery.of(context).size.height - _appbar.preferredSize.height,
+        color: Colors.white,
+        child: RefreshIndicator(
+          onRefresh: _onRefresh,
+          child: ListView.builder(
+            itemBuilder: (BuildContext context, int index) {
               // build view list
-              return _buildItem(context, index + 2);
-            }
-          },
-          itemCount: _getItemCount(),
+              return _buildItem(context, index);
+            },
+            itemCount: _dataList.length,
+            controller: _scrollController,
+          ),
         ),
       ),
     );
@@ -63,47 +75,25 @@ class _HomeViewState extends State<HomeView> {
     print('refreshing...');
     _currentPage = 1;
     await _requestData(_currentPage);
-    // await Future.delayed(const Duration(seconds: 3), () {
-    //   print('dropdown to refresh.');
-    // });
   }
 
-  int _getItemCount() {
-    if (_dataList.length > 3) {
-      return _dataList.length - 3 + 1;
+  Future _requestData(int page) async {
+    print("page: " + page.toString());
+    print("path: " + path.toString());
+    HomeModel data = await _netManager.queryDataByWord(page, path);
+    if (page == 1) {
+      _dataList.clear();
+      _dataList.addAll(data.result.newslist);
     } else {
-      return 0;
+      // load more data
+      _dataList.addAll(data.result.newslist);
     }
+    _currentPage++;
+
+    setState(() {});
+    return;
   }
 
-  // handle swapper
-  Widget _buildSwiper(BuildContext context) {
-    return Container(
-      height: 150,
-      child: Swiper(
-        pagination: const SwiperPagination(),
-        control: const SwiperControl(),
-        autoplay: true,
-        itemCount: 3,
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            margin: const EdgeInsets.only(bottom: 5),
-            color: Colors.orange,
-            width: MediaQuery.of(context).size.width,
-            height: 150,
-            child: Image.network(
-              _dataList[_dataList.length - 1].picUrl,
-              height: 150,
-              width: MediaQuery.of(context).size.width,
-              fit: BoxFit.fitWidth,
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  // handle view list
   Widget _buildItem(BuildContext context, int index) {
     return Container(
       height: 110,
@@ -116,7 +106,7 @@ class _HomeViewState extends State<HomeView> {
             color: Colors.grey,
             child: Image.network(
               // "http://n.sinaimg.cn/sinakd202124s/162/w550h412/20210204/6706-kirmait9301473.jpg",
-              _dataList[_dataList.length - 1].picUrl,
+              _dataList[index].picUrl,
               width: 130,
               height: 110,
               fit: BoxFit.fitHeight,
@@ -149,21 +139,5 @@ class _HomeViewState extends State<HomeView> {
         ],
       ),
     );
-  }
-
-  Future _requestData(int page) async {
-    print("page: " + page.toString());
-    HomeModel data = await _netManager.queryHomeData(page);
-    if (page == 1) {
-      _dataList.clear();
-      _dataList.addAll(data.result.newslist);
-    } else {
-      // load more data
-      _dataList.addAll(data.result.newslist);
-    }
-    _currentPage++;
-
-    setState(() {});
-    return;
   }
 }
