@@ -116,10 +116,10 @@ class _HomeViewState extends State<HomeView> {
             color: Colors.grey,
             child: Image.network(
               // "http://n.sinaimg.cn/sinakd202124s/162/w550h412/20210204/6706-kirmait9301473.jpg",
-              _dataList[_dataList.length - 1].picUrl,
+              _dataList[index].picUrl,
               width: 130,
               height: 110,
-              fit: BoxFit.fitHeight,
+              fit: BoxFit.fill,
             ),
           ),
           Column(
@@ -127,7 +127,7 @@ class _HomeViewState extends State<HomeView> {
             children: <Widget>[
               Container(
                 margin: const EdgeInsets.only(left: 10, top: 10, right: 10),
-                width: MediaQuery.of(context).size.width - 130 - 20,
+                width: MediaQuery.of(context).size.width - 130 - 50,
                 child: Text(
                   _dataList[index].title,
                   overflow: TextOverflow.ellipsis,
@@ -138,10 +138,12 @@ class _HomeViewState extends State<HomeView> {
               ),
               Container(
                 margin: const EdgeInsets.only(left: 10, top: 5),
-                child: Text(_dataList[index].description),
+                width: MediaQuery.of(context).size.width - 130 - 50,
+                child: Text(_dataList[index].description, maxLines: 1, overflow: TextOverflow.ellipsis,softWrap: true),
               ),
               Container(
                 margin: const EdgeInsets.only(left: 10, top: 5),
+                width: MediaQuery.of(context).size.width - 130 - 50,
                 child: Text(_dataList[index].ctime),
               ),
             ],
