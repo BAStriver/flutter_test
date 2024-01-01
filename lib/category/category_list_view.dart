@@ -112,7 +112,7 @@ class _CategoryListViewState extends State<CategoryListView> {
                 _dataList[index].picUrl,
                 width: 130,
                 height: 110,
-                fit: BoxFit.fitHeight,
+                fit: BoxFit.fill,
               ),
             ),
             Column(
@@ -120,7 +120,7 @@ class _CategoryListViewState extends State<CategoryListView> {
               children: <Widget>[
                 Container(
                   margin: const EdgeInsets.only(left: 10, top: 10, right: 10),
-                  width: MediaQuery.of(context).size.width - 130 - 20,
+                  width: MediaQuery.of(context).size.width - 130 - 50,
                   child: Text(
                     _dataList[index].title,
                     overflow: TextOverflow.ellipsis,
@@ -131,10 +131,12 @@ class _CategoryListViewState extends State<CategoryListView> {
                 ),
                 Container(
                   margin: const EdgeInsets.only(left: 10, top: 5),
-                  child: Text(_dataList[index].description),
+                  width: MediaQuery.of(context).size.width - 130 - 50,
+                  child: Text(_dataList[index].description, maxLines: 1, overflow: TextOverflow.ellipsis,softWrap: true),
                 ),
                 Container(
                   margin: const EdgeInsets.only(left: 10, top: 5),
+                  width: MediaQuery.of(context).size.width - 130 - 50,
                   child: Text(_dataList[index].ctime),
                 ),
               ],
