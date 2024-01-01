@@ -2,7 +2,7 @@ import 'dart:js';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_123/category/category_view.dart';
-import 'package:flutter_123/collection/collectin_view.dart';
+import 'package:flutter_123/collection/collection_view.dart';
 import 'package:flutter_123/home/home_view.dart';
 
 void main() {
@@ -16,8 +16,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: _containerView(context),
+      home: _AppPage(),
     );
+  }
+}
+
+class _AppPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return _containerView(context);
   }
 
   Widget _containerView(BuildContext context) {
@@ -59,7 +66,7 @@ class MyApp extends StatelessWidget {
                   ),
                   onTap: () {
                     print('enter collection view.');
-                    Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) {
                       print('enter collection view2.');
                       return CollectionView();
                     }));
